@@ -1,0 +1,4 @@
+# ninja log v5
+6	10370	1723148507781719000	/home/by12/Multi-elevation-NeRF/SparseGS/submodules/simple-knn/build/temp.linux-x86_64-cpython-37/simple_knn.o	6641c394f50e78d5
+5	30532	1723148527861521000	/home/by12/Multi-elevation-NeRF/SparseGS/submodules/simple-knn/build/temp.linux-x86_64-cpython-37/ext.o	9ec9a376db409cc7
+6	66441	1723148563866850000	/home/by12/Multi-elevation-NeRF/SparseGS/submodules/simple-knn/build/temp.linux-x86_64-cpython-37/spatial.o	2662b49ebe2960e

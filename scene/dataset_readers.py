@@ -121,7 +121,12 @@ def readColmapCameras(cam_extrinsics, cam_intrinsics, images_folder, step=1, max
 
         image_path = os.path.join(images_folder, os.path.basename(extr.name))
         image_name = os.path.basename(image_path).split(".")[0]
-        image = Image.open(image_path)
+        try:
+            image = Image.open(image_path)
+        except:
+            print("Error reading image ", image_path)
+            continue
+        
 
         depth = None
         if load_depth:
@@ -218,8 +223,9 @@ def readColmapSceneInfo(path, images, eval, llffhold=8, step=1, max_cameras=None
     holdout_infos = sorted(holdout_infos_unsorted.copy(), key = lambda x : x.image_name)
 
     if eval:
-        train_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold != 0]
-        test_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold == 0]
+        train_cam_infos = [c for c in cam_infos if not c.image_name.startswith("site")]
+        test_cam_infos = [c for c in cam_infos if c.image_name.startswith("site")]
+        print(f"!!!!!Split into {len(train_cam_infos)} training and {len(test_cam_infos)} testing cameras.")
     else:
         train_cam_infos = cam_infos
         test_cam_infos = []

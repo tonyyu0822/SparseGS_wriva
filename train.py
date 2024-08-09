@@ -5,7 +5,7 @@ import torch.nn.functional as F
 import math
 import cv2
 import diptest
-from icecream import ic
+# from icecream import ic
 from guidance.sd_utils import StableDiffusion
 from random import randint
 from utils.loss_utils import l1_loss, ssim, local_pearson_loss, pearson_depth_loss, mask_l1_loss
@@ -16,7 +16,7 @@ from gaussian_renderer import render, network_gui
 import sys
 from scene import Scene, GaussianModel
 from utils.general_utils import safe_state, normalize
-import time
+# import time
 import uuid
 from tqdm import tqdm
 from utils.image_utils import psnr

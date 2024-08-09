@@ -14,6 +14,7 @@ import numpy as np
 from utils.general_utils import PILtoTorch, NP_resize
 from utils.graphics_utils import fov2focal
 import torch
+import csv
 
 WARNED = False
 
@@ -58,6 +59,81 @@ def loadCam(args, id, cam_info, resolution_scale):
                   FoVx=cam_info.FovX, FoVy=cam_info.FovY, warp_mask = None,
                   image=gt_image, depth=resized_depth, gt_alpha_mask=loaded_mask, K=None, src_R=None, src_T=None,src_uid = id,
                   image_name=cam_info.image_name, uid=id, data_device=args.data_device)
+
+def cameraList_from_camInfos_ground(cam_infos, resolution_scale, args):
+    # camera_list = []
+    # ground_cam_list = []
+
+    # for id, c in enumerate(cam_infos):
+    #     print("image name",c.image_name)
+    #     index = c.image_path.find("images/")
+    #     if index != -1:
+    #         # Exclude everything starting from "images/" and append "manifest.csv" instead
+    #         csv_path = c.image_path[:index] + "manifest.csv"
+    #     with open(csv_path, mode='r', encoding='utf-8') as csv_file:
+    #         csv_reader = csv.DictReader(csv_file)
+    #         # Iterate through each row in the CSV
+    #         for row in csv_reader:
+    #             # Check if the altitude column has the value "ground"
+    #             if row['altitude'] == 'ground':
+    #                 # Check if the source (image_name) does not start with "site"
+    #                 if not row['destination'].startswith('site'):
+    #                     # Append the corresponding source value to the list
+    #                     ground_cam_list.append(row['destination'][])
+    #     if c.image_name in ground_cam_list:
+    #         camera_list.append(loadCam(args, id, c, resolution_scale))
+    # print("camera list length",len(camera_list))
+    # return camera_list
+     # Step 1: Extract destinations with 'ground' altitude from the manifest
+    ground_destinations = set()  # Using a set for faster lookup
+    for c in cam_infos:
+        index = c.image_path.find("images/")
+        if index != -1:
+            # Construct the path to the manifest.csv file
+            manifest_path = c.image_path[:index] + "manifest.csv"
+            break  # Assuming all cameras have the same root path to the manifest
+    
+    # Open and read the manifest.csv file once
+    with open(manifest_path, mode='r', encoding='utf-8') as csv_file:
+        csv_reader = csv.DictReader(csv_file)
+        for row in csv_reader:
+            if row['altitude'] == 'ground' and not row['destination'].startswith('site'):
+                ground_destinations.add(row['destination'][:-4])
+                
+    # Step 2: Filter cam_infos based on whether they are in ground_destinations
+    camera_list = []
+    for id, c in enumerate(cam_infos):
+        if c.image_name in ground_destinations:  # Check if the camera's image name is in the set
+            camera_list.append(loadCam(args, id, c, resolution_scale))
+    print("camera list length",len(camera_list))
+    return camera_list
+
+
+
+def cameraList_from_camInfos_drone(cam_infos, resolution_scale, args):
+     # Step 1: Extract destinations with 'drone' altitude from the manifest
+    drone_destinations = set()  # Using a set for faster lookup
+    for c in cam_infos:
+        index = c.image_path.find("images/")
+        if index != -1:
+            # Construct the path to the manifest.csv file
+            manifest_path = c.image_path[:index] + "manifest.csv"
+            break  # Assuming all cameras have the same root path to the manifest
+    
+    # Open and read the manifest.csv file once
+    with open(manifest_path, mode='r', encoding='utf-8') as csv_file:
+        csv_reader = csv.DictReader(csv_file)
+        for row in csv_reader:
+            if row['altitude'] == 'airborne' and not row['destination'].startswith('site'):
+                drone_destinations.add(row['destination'][:-4])
+                
+    # Step 2: Filter cam_infos based on whether they are in ground_destinations
+    camera_list = []
+    for id, c in enumerate(cam_infos):
+        if c.image_name in drone_destinations:  # Check if the camera's image name is in the set
+            camera_list.append(loadCam(args, id, c, resolution_scale))
+    print("camera list length",len(camera_list))
+    return camera_list
 
 def cameraList_from_camInfos(cam_infos, resolution_scale, args):
     camera_list = []
